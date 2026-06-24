@@ -43,7 +43,7 @@ export const DEFAULTS = {
   housePrice: 900_000,
   buyAge: 33,
   financed: true,         // true = mortgage; false = pay cash
-  downPct: 0.30,
+  downPct: 0.20,
   mortgageRate: 0.065,
   mortgageYears: 30,
   propTaxRate: 0.0125,    // CA Prop 13: this base grows 2%/yr, not with inflation
