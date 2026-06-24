@@ -68,7 +68,7 @@ export const SECTIONS = [
     defaultCollapsed: true,
     fields: [
       { key: 'buyHome', label: 'Buy a home', type: 'bool' },
-      { key: 'rentBeforeBuying', label: 'Rent until you buy (annual)', labelFn: (c) => (c.buyHome ? 'Rent until you buy (annual)' : 'Annual rent'), type: 'dollar', min: 0, max: 150_000, step: 1_000 },
+      { key: 'rentBeforeBuying', label: 'Rent until you buy', labelFn: (c) => (c.buyHome ? 'Rent until you buy' : 'Rent'), type: 'dollarMonthly', min: 0, max: 12_000, step: 100 },
       { key: 'housePrice', label: 'House price', type: 'dollar', min: 0, max: 5_000_000, step: 25_000, disabledWhen: notBuying },
       { key: 'buyAge', label: 'Buy at age', type: 'number', min: 18, max: 90, step: 1, disabledWhen: notBuying },
       { key: 'financed', label: 'Finance with a mortgage', type: 'bool', disabledWhen: notBuying },

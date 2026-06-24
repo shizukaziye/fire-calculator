@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 
 // Percent fields are stored as decimals (0.08) but edited in whole percents (8).
-const toDisplay = (f, v) => (f.type === 'percent' ? +(v * 100).toFixed(4) : v);
-const fromDisplay = (f, dv) => (f.type === 'percent' ? dv / 100 : dv);
+// dollarMonthly fields are stored as an ANNUAL amount but edited per month (÷12).
+const toDisplay = (f, v) =>
+  f.type === 'percent' ? +(v * 100).toFixed(4) : f.type === 'dollarMonthly' ? Math.round(v / 12) : v;
+const fromDisplay = (f, dv) =>
+  f.type === 'percent' ? dv / 100 : f.type === 'dollarMonthly' ? dv * 12 : dv;
 
 export default function Field({ field, value, onChange, disabled = false }) {
   if (field.type === 'bool') {
@@ -47,7 +50,8 @@ export default function Field({ field, value, onChange, disabled = false }) {
   };
 
   const isPct = field.type === 'percent';
-  const isUsd = field.type === 'dollar';
+  const isUsd = field.type === 'dollar' || field.type === 'dollarMonthly';
+  const isMonthly = field.type === 'dollarMonthly';
   const sliderValue = Math.min(Math.max(dv, field.min), field.max);
 
   return (
@@ -75,6 +79,7 @@ export default function Field({ field, value, onChange, disabled = false }) {
             className="w-24 rounded bg-slate-800 px-2 py-1 text-right text-sm tabular-nums text-slate-100 outline-none focus:ring-1 focus:ring-emerald-400 disabled:cursor-not-allowed"
           />
           {isPct && <span className="text-xs text-slate-500">%</span>}
+          {isMonthly && <span className="text-xs text-slate-500">/mo</span>}
         </div>
       </div>
       <input
