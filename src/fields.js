@@ -39,7 +39,8 @@ export const SECTIONS = [
     title: 'Starting balances (today $)',
     fields: [
       { key: 'taxable', label: 'Taxable / brokerage / cash', type: 'dollar', min: 0, max: 5_000_000, step: 10_000 },
-      { key: 'roth', label: 'Roth (IRA + 401k)', type: 'dollar', min: 0, max: 3_000_000, step: 5_000 },
+      { key: 'roth', label: 'Roth — total (IRA + 401k)', type: 'dollar', min: 0, max: 3_000_000, step: 5_000 },
+      { key: 'rothContrib', label: 'Roth — contributions (usable now)', type: 'dollar', min: 0, max: 3_000_000, step: 5_000 },
       { key: 'pretax', label: 'Pre-tax / traditional (401k + IRA)', type: 'dollar', min: 0, max: 3_000_000, step: 5_000 },
       { key: 'hsa', label: 'HSA', type: 'dollar', min: 0, max: 200_000, step: 1_000 },
     ],
@@ -67,6 +68,7 @@ export const SECTIONS = [
     defaultCollapsed: true,
     fields: [
       { key: 'buyHome', label: 'Buy a home', type: 'bool' },
+      { key: 'rentBeforeBuying', label: 'Rent until you buy (annual)', labelFn: (c) => (c.buyHome ? 'Rent until you buy (annual)' : 'Annual rent'), type: 'dollar', min: 0, max: 150_000, step: 1_000 },
       { key: 'housePrice', label: 'House price', type: 'dollar', min: 0, max: 5_000_000, step: 25_000, disabledWhen: notBuying },
       { key: 'buyAge', label: 'Buy at age', type: 'number', min: 18, max: 90, step: 1, disabledWhen: notBuying },
       { key: 'financed', label: 'Finance with a mortgage', type: 'bool', disabledWhen: notBuying },
@@ -76,7 +78,6 @@ export const SECTIONS = [
       { key: 'propTaxRate', label: 'Property tax rate', type: 'percent', min: 0, max: 3, step: 0.05, disabledWhen: notBuying },
       { key: 'maintRate', label: 'Maintenance / yr', type: 'percent', min: 0, max: 5, step: 0.1, disabledWhen: notBuying },
       { key: 'insRate', label: 'Insurance / yr', type: 'percent', min: 0, max: 2, step: 0.05, disabledWhen: notBuying },
-      { key: 'rentBeforeBuying', label: 'Rent (before buying / if renting)', type: 'dollar', min: 0, max: 150_000, step: 1_000 },
     ],
   },
   {

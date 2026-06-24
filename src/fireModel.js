@@ -22,7 +22,9 @@ export const DEFAULTS = {
 
   // --- starting balances (today $) — consolidated by tax treatment ---
   taxable: 1_730_000,     // brokerage + cash + misc — accessible anytime
-  roth: 765_000,          // ALL Roth (IRA + 401k) — basis accessible anytime
+  roth: 765_000,          // ALL Roth (IRA + 401k), total balance
+  rothContrib: 131_000,   // of that Roth, the CONTRIBUTIONS — withdrawable anytime.
+                          // The rest (earnings) is locked until 59.5, like a 401k.
   pretax: 436_000,        // ALL pre-tax / traditional (401k + IRA) — locked till 59.5, OR Roth-ladder from retireAge+5
   hsa: 45_000,            // medical / age 65 (modeled with the locked bucket)
 
@@ -132,13 +134,16 @@ export function project(cfg = {}, seq) {
     return t;
   };
 
-  // Buckets, split by tax treatment so withdrawals can be taxed by source:
-  //   spendable = taxable + Roth — usable now, treated as tax-light on withdrawal
-  //   pretax    = Traditional / pre-tax — ordinary income tax when withdrawn
-  //   hsa       = medical — tax-free
-  // pretax + hsa are unreachable ("locked") until ladderAge.
-  let spendable = c.taxable + c.roth;
+  // Buckets, split by access + tax treatment:
+  //   spendable = taxable + Roth CONTRIBUTIONS — usable now, withdrawals tax-light
+  //   pretax    = Traditional / pre-tax — ordinary income tax; unlocks at ladderAge
+  //   rothEarn  = Roth EARNINGS (total Roth − contributions) — tax-free, but locked
+  //               until age 59.5 (contributions come out first, earnings last)
+  //   hsa       = medical — tax-free; unlocks at ladderAge
+  const rothContrib = Math.min(c.rothContrib, c.roth);
+  let spendable = c.taxable + rothContrib;
   let pretax = c.pretax;
+  let rothEarn = c.roth - rothContrib;
   let hsa = c.hsa;
 
   const buying = !!c.buyHome;
@@ -160,11 +165,13 @@ export function project(cfg = {}, seq) {
 
     spendable *= 1 + ret;
     pretax *= 1 + ret;
+    rothEarn *= 1 + ret;
     hsa *= 1 + ret;
-    if (buying && age === c.buyAge) spendable -= down;
 
     const working = age < c.retireAge;
-    const unlocked = age >= ladderAge;
+    const pretaxOpen = age >= ladderAge;  // pre-tax: Roth ladder (retire+5) or 59.5
+    const rothOpen = age >= 59.5;         // Roth earnings: always 59.5
+    const hsaOpen = age >= ladderAge;
 
     // housing (nominal): mortgage P&I (fixed) + Prop-13 tax + maint + ins.
     // If buyHome is false, you rent every year instead.
@@ -173,7 +180,8 @@ export function project(cfg = {}, seq) {
       const pay = c.financed && age < payoffAge ? mortPay : 0;
       const tax = c.housePrice * c.propTaxRate * Math.pow(1.02, age - c.buyAge);
       const upkeep = c.housePrice * (c.maintRate + c.insRate) * infl;
-      housing = pay + tax + upkeep;
+      const downThisYear = age === c.buyAge ? down : 0;  // cash outlay shows up here
+      housing = pay + tax + upkeep + downThisYear;
     } else {
       housing = c.rentBeforeBuying * infl;
     }
@@ -188,12 +196,17 @@ export function project(cfg = {}, seq) {
       spendable += net;                  // surplus parks in taxable
     } else {
       let need = -net;                   // nominal, after-tax dollars still required
-      // 1) taxable + Roth first — treated as tax-free (your basis, Roth, low LTCG)
+      // 1) taxable + Roth contributions — tax-free
       const fromSpend = Math.min(Math.max(spendable, 0), need);
       spendable -= fromSpend; need -= fromSpend;
-      // 2) pre-tax / Traditional — taxed at ordinary rates, only once unlocked.
+      // 2) Roth earnings — tax-free, once they unlock at 59.5
+      if (need > 1 && rothOpen && rothEarn > 0) {
+        const fromRoth = Math.min(rothEarn, need);
+        rothEarn -= fromRoth; need -= fromRoth;
+      }
+      // 3) pre-tax / Traditional — taxed at ordinary rates, once unlocked.
       //    Gross up the withdrawal so its after-tax proceeds cover the need.
-      if (need > 1 && unlocked && pretax > 0) {
+      if (need > 1 && pretaxOpen && pretax > 0) {
         const realNeed = need / infl;
         let realGross = realNeed;
         for (let i = 0; i < 5; i++) realGross = realNeed / (1 - retOrdinaryRate(realGross));
@@ -205,18 +218,20 @@ export function project(cfg = {}, seq) {
           need -= delivered; pretax = 0;
         }
       }
-      // 3) HSA — tax-free (medical), only once unlocked
-      if (need > 1 && unlocked && hsa > 0) {
+      // 4) HSA — tax-free (medical), once unlocked
+      if (need > 1 && hsaOpen && hsa > 0) {
         const fromHsa = Math.min(hsa, need);
         hsa -= fromHsa; need -= fromHsa;
       }
-      // 4) anything still unmet drives the spendable bucket negative -> "depleted"
+      // 5) anything still unmet drives the spendable bucket negative -> "depleted"
       if (need > 1) spendable -= need;
     }
 
-    const unusable = unlocked ? 0 : pretax + hsa;  // pre-tax/HSA you can't touch yet
-    const usable = spendable + (unlocked ? pretax + hsa : 0);
-    const netWorth = spendable + pretax + hsa;      // total wealth
+    const unusable =                       // retirement money you can't touch yet
+      (pretaxOpen ? 0 : pretax) + (rothOpen ? 0 : rothEarn) + (hsaOpen ? 0 : hsa);
+    const usable =
+      spendable + (pretaxOpen ? pretax : 0) + (rothOpen ? rothEarn : 0) + (hsaOpen ? hsa : 0);
+    const netWorth = spendable + pretax + rothEarn + hsa;  // total wealth
     rows.push({
       age,
       working,

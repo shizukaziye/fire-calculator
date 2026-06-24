@@ -125,7 +125,7 @@ export default function InputPanel({ config, setField, onReset, mode }) {
                     {section.fields.map((field) => (
                       <Field
                         key={field.key}
-                        field={field}
+                        field={field.labelFn ? { ...field, label: field.labelFn(config) } : field}
                         value={config[field.key]}
                         disabled={field.disabledWhen ? field.disabledWhen(config) : false}
                         onChange={(v) => setField(field.key, v)}

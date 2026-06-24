@@ -7,7 +7,7 @@ const COLS = [
   { key: 'spend', label: 'Spend' },
   { key: 'housing', label: 'Housing' },
   { key: 'usable', label: 'Usable' },
-  { key: 'unusable', label: 'Locked 401k' },
+  { key: 'unusable', label: 'Locked' },
 ];
 
 export default function ProjectionTable({ rows, dollars }) {
@@ -75,10 +75,10 @@ export default function ProjectionTable({ rows, dollars }) {
       </div>
       <p className="mt-2 text-xs text-slate-500">
         <span className="text-slate-400">Usable</span> = money you can spend now
-        (taxable + Roth, plus pre-tax + HSA once the Roth ladder / age 59.5 opens
-        it). <span className="text-slate-400">Locked 401k</span> = pre-tax + HSA
-        you can&apos;t touch yet. Red rows = the plan has run out. Toggle nominal
-        vs today&apos;s $ on the chart above.
+        (taxable + Roth contributions, plus pre-tax + Roth earnings + HSA once the
+        Roth ladder / age 59.5 opens them). <span className="text-slate-400">Locked</span>{' '}
+        = retirement money you can&apos;t touch yet. Housing in the buy year
+        includes the down payment. Red rows = the plan has run out.
       </p>
     </section>
   );

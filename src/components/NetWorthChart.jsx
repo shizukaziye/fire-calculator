@@ -50,7 +50,7 @@ function NwTooltip({ active, payload, label }) {
       <div className="mb-1 font-medium text-slate-200">Age {label}</div>
       {row('Net worth', d.total, '#34d399')}
       {row('Usable now', d.usable, '#38bdf8')}
-      {locked > 0 && row('Locked 401k', locked, '#94a3b8')}
+      {locked > 0 && row('Locked', locked, '#94a3b8')}
     </div>
   );
 }
@@ -98,8 +98,9 @@ export default function NetWorthChart({ rows, dollars, onToggle }) {
         </LineChart>
       </ResponsiveContainer>
       <p className="mt-2 text-xs text-slate-500">
-        The gap between the two lines is your locked 401k / pre-tax money — not
-        spendable until the Roth ladder or age 59.5 opens it up.
+        The gap between the two lines is your locked retirement money — pre-tax
+        401k/IRA + Roth earnings + HSA — not spendable until the Roth ladder or
+        age 59.5 opens it up.
       </p>
     </section>
   );
