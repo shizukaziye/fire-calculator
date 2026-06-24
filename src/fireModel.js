@@ -61,7 +61,9 @@ export const DEFAULTS = {
 
   // --- mechanics ---
   useRothLadder: true,    // pre-tax bucket accessible 5 yrs after you retire
-  retirementTaxGrossup: 1.08, // withdrawals are mostly taxable/Roth -> low rate
+  // (Retirement taxes are no longer a flat knob — they're computed per
+  //  withdrawal: taxable/Roth treated as tax-light, pre-tax taxed at ordinary
+  //  MFJ + CA rates. See project().)
 
   // --- Monte Carlo controls (used by the sim layer; project() ignores them) ---
   returnVol: 0.18,        // annual std dev of nominal return
@@ -90,6 +92,18 @@ function mortgageAnnual(principal, rate, years) {
   return (principal * r / (1 - Math.pow(1 + r, -n))) * 12;
 }
 
+// Effective ordinary-income tax rate (MFJ federal + CA, no FICA) on a pre-tax /
+// Traditional withdrawal of `realAmount` TODAY'S dollars. Brackets stay in real
+// terms (deductions applied to the real amount) so there's no fake bracket-creep
+// decades out. Used to gross up retirement withdrawals from the pre-tax bucket.
+function retOrdinaryRate(realAmount) {
+  if (realAmount <= 0) return 0;
+  const tax =
+    bracketTax(Math.max(0, realAmount - 30000), FED) +
+    bracketTax(Math.max(0, realAmount - 11080), CA);
+  return Math.min(0.6, tax / realAmount);
+}
+
 /**
  * Run the year-by-year projection.
  * @param {object} cfg  config overrides on top of DEFAULTS
@@ -97,8 +111,11 @@ function mortgageAnnual(principal, rate, years) {
  *        { returns: number[], inflations: number[] } indexed by year offset
  *        (0 = currentAge). When omitted, the constant nominalReturn / inflation
  *        are used and the output is identical to the deterministic engine.
- * @returns {Array<{age,working,income,spend,housing,accessible,locked,
- *                   netWorthNominal,netWorthToday,depleted}>}
+ * @returns {Array<{age,working,income,spend,housing,usable,unusable,
+ *                   netWorthNominal,netWorthToday,infl,depleted}>}
+ *   usable   = money you can spend now (taxable+Roth, plus pre-tax+HSA once unlocked)
+ *   unusable = pre-tax+HSA still locked until the Roth ladder / age 59.5
+ *   infl     = cumulative inflation factor (divide a nominal value by it for today's $)
  */
 export function project(cfg = {}, seq) {
   const c = { ...DEFAULTS, ...cfg };
@@ -115,11 +132,14 @@ export function project(cfg = {}, seq) {
     return t;
   };
 
-  // Two buckets: "accessible" now, and "locked" until ladderAge.
-  // (Roth basis treated as accessible — slightly optimistic; refine if you
-  //  know your Roth contribution vs growth split.)
-  let accessible = c.taxable + c.roth;
-  let locked = c.pretax + c.hsa;
+  // Buckets, split by tax treatment so withdrawals can be taxed by source:
+  //   spendable = taxable + Roth — usable now, treated as tax-light on withdrawal
+  //   pretax    = Traditional / pre-tax — ordinary income tax when withdrawn
+  //   hsa       = medical — tax-free
+  // pretax + hsa are unreachable ("locked") until ladderAge.
+  let spendable = c.taxable + c.roth;
+  let pretax = c.pretax;
+  let hsa = c.hsa;
 
   const buying = !!c.buyHome;
   const down = buying ? (c.financed ? c.downPct * c.housePrice : c.housePrice) : 0;
@@ -138,11 +158,13 @@ export function project(cfg = {}, seq) {
     const inflRate = inflations && inflations[yr] != null ? inflations[yr] : c.inflation;
     const infl = inflations ? inflFactor : Math.pow(1 + c.inflation, yr);
 
-    accessible *= 1 + ret;
-    locked *= 1 + ret;
-    if (buying && age === c.buyAge) accessible -= down;
+    spendable *= 1 + ret;
+    pretax *= 1 + ret;
+    hsa *= 1 + ret;
+    if (buying && age === c.buyAge) spendable -= down;
 
     const working = age < c.retireAge;
+    const unlocked = age >= ladderAge;
 
     // housing (nominal): mortgage P&I (fixed) + Prop-13 tax + maint + ins.
     // If buyHome is false, you rent every year instead.
@@ -163,31 +185,50 @@ export function project(cfg = {}, seq) {
 
     const net = income + ss - spend;
     if (net >= 0) {
-      accessible += net;                 // surplus parks in taxable
+      spendable += net;                  // surplus parks in taxable
     } else {
-      let need = -net * (working ? 1 : c.retirementTaxGrossup);
-      const fromAcc = Math.min(Math.max(accessible, 0), need);
-      accessible -= fromAcc; need -= fromAcc;
-      if (need > 0 && age >= ladderAge) {
-        const fromLocked = Math.min(Math.max(locked, 0), need);
-        locked -= fromLocked; need -= fromLocked;
+      let need = -net;                   // nominal, after-tax dollars still required
+      // 1) taxable + Roth first — treated as tax-free (your basis, Roth, low LTCG)
+      const fromSpend = Math.min(Math.max(spendable, 0), need);
+      spendable -= fromSpend; need -= fromSpend;
+      // 2) pre-tax / Traditional — taxed at ordinary rates, only once unlocked.
+      //    Gross up the withdrawal so its after-tax proceeds cover the need.
+      if (need > 1 && unlocked && pretax > 0) {
+        const realNeed = need / infl;
+        let realGross = realNeed;
+        for (let i = 0; i < 5; i++) realGross = realNeed / (1 - retOrdinaryRate(realGross));
+        const gross = realGross * infl;
+        if (gross <= pretax) {
+          pretax -= gross; need = 0;
+        } else {
+          const delivered = pretax * (1 - retOrdinaryRate(pretax / infl));
+          need -= delivered; pretax = 0;
+        }
       }
-      if (need > 1) accessible -= need;  // unmet -> goes negative -> "depleted"
+      // 3) HSA — tax-free (medical), only once unlocked
+      if (need > 1 && unlocked && hsa > 0) {
+        const fromHsa = Math.min(hsa, need);
+        hsa -= fromHsa; need -= fromHsa;
+      }
+      // 4) anything still unmet drives the spendable bucket negative -> "depleted"
+      if (need > 1) spendable -= need;
     }
 
-    const lockedAvailable = age >= ladderAge ? locked : 0;
-    const netWorth = accessible + locked; // total wealth (incl not-yet-accessible)
+    const unusable = unlocked ? 0 : pretax + hsa;  // pre-tax/HSA you can't touch yet
+    const usable = spendable + (unlocked ? pretax + hsa : 0);
+    const netWorth = spendable + pretax + hsa;      // total wealth
     rows.push({
       age,
       working,
       income: Math.round(income),
       spend: Math.round(spend),
       housing: Math.round(housing),
-      accessible: Math.round(accessible),
-      locked: Math.round(lockedAvailable),
+      usable: Math.round(usable),
+      unusable: Math.round(unusable),
       netWorthNominal: Math.round(netWorth),
       netWorthToday: Math.round(netWorth / infl),
-      depleted: accessible < -1,
+      infl,
+      depleted: spendable < -1,
     });
 
     inflFactor *= 1 + inflRate;          // advance cumulative inflation for next year
@@ -195,7 +236,7 @@ export function project(cfg = {}, seq) {
   return rows;
 }
 
-/** True if the plan reaches endAge without the accessible bucket going negative. */
+/** True if the plan reaches endAge without the spendable bucket going negative. */
 export function survives(cfg = {}, seq) {
   return !project(cfg, seq).some((r) => r.depleted);
 }

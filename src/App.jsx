@@ -40,7 +40,7 @@ function ModeTabs({ mode, onChange }) {
 export default function App() {
   const [config, setConfig] = useState(() => ({ ...DEFAULTS }));
   const [mode, setMode] = useState('fixed');
-  const [todayDollars, setTodayDollars] = useState(false);
+  const [dollars, setDollars] = useState('today'); // 'today' | 'nominal'
 
   const setField = (key, value) => setConfig((c) => ({ ...c, [key]: value }));
   const reset = () => setConfig({ ...DEFAULTS });
@@ -99,12 +99,8 @@ export default function App() {
           {mode === 'fixed' ? (
             <>
               <SummaryCard rows={rows} survives={ok} config={config} />
-              <NetWorthChart
-                rows={rows}
-                todayDollars={todayDollars}
-                onToggle={setTodayDollars}
-              />
-              <ProjectionTable rows={rows} />
+              <NetWorthChart rows={rows} dollars={dollars} onToggle={setDollars} />
+              <ProjectionTable rows={rows} dollars={dollars} />
             </>
           ) : (
             <>

@@ -105,7 +105,6 @@ export const SECTIONS = [
     defaultCollapsed: true,
     fields: [
       { key: 'useRothLadder', label: 'Use Roth ladder (pre-tax at retire + 5)', type: 'bool' },
-      { key: 'retirementTaxGrossup', label: 'Retirement tax gross-up', type: 'multiplier', min: 1, max: 1.5, step: 0.01 },
     ],
   },
   {
