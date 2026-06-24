@@ -17,7 +17,7 @@ export const DEFAULTS = {
   endAge: 90,
 
   // --- market assumptions (also the Monte Carlo means) ---
-  nominalReturn: 0.08,    // 0.085, 0.09 ... (real return = (1+nom)/(1+infl)-1)
+  nominalReturn: 0.09,    // 0.085, 0.09 ... (real return = (1+nom)/(1+infl)-1)
   inflation: 0.04,        // 0.035, 0.03 ...
 
   // --- starting balances (today $) — consolidated by tax treatment ---
@@ -56,7 +56,7 @@ export const DEFAULTS = {
   kidSpacingYears: 2,
 
   // --- social security ---
-  ssAnnual: 35_000,       // today $, household; use a haircut if you stop early
+  ssAnnual: 0,            // today $, household; use a haircut if you stop early
   ssStartAge: 67,
 
   // --- mechanics ---

@@ -64,6 +64,7 @@ export const SECTIONS = [
   {
     id: 'housing',
     title: 'Housing',
+    defaultCollapsed: true,
     fields: [
       { key: 'buyHome', label: 'Buy a home', type: 'bool' },
       { key: 'housePrice', label: 'House price', type: 'dollar', min: 0, max: 5_000_000, step: 25_000, disabledWhen: notBuying },
@@ -81,6 +82,7 @@ export const SECTIONS = [
   {
     id: 'kids',
     title: 'Kids / college',
+    defaultCollapsed: true,
     fields: [
       { key: 'numKids', label: 'Number of kids', type: 'number', min: 0, max: 6, step: 1 },
       { key: 'collegePerKidPerYear', label: 'College / kid / yr', type: 'dollar', min: 0, max: 200_000, step: 5_000 },
@@ -91,6 +93,7 @@ export const SECTIONS = [
   {
     id: 'socialsecurity',
     title: 'Social Security',
+    defaultCollapsed: true,
     fields: [
       { key: 'ssAnnual', label: 'SS annual (today $, household)', type: 'dollar', min: 0, max: 100_000, step: 1_000 },
       { key: 'ssStartAge', label: 'SS start age', type: 'number', min: 60, max: 75, step: 1 },
@@ -99,6 +102,7 @@ export const SECTIONS = [
   {
     id: 'mechanics',
     title: 'Mechanics',
+    defaultCollapsed: true,
     fields: [
       { key: 'useRothLadder', label: 'Use Roth ladder (pre-tax at retire + 5)', type: 'bool' },
       { key: 'retirementTaxGrossup', label: 'Retirement tax gross-up', type: 'multiplier', min: 1, max: 1.5, step: 0.01 },
@@ -108,6 +112,7 @@ export const SECTIONS = [
     id: 'montecarlo',
     title: 'Monte Carlo settings',
     onlyInMode: 'montecarlo',
+    defaultCollapsed: true,
     fields: [
       { key: 'returnVol', label: 'Return volatility (σ)', type: 'percent', min: 0, max: 40, step: 0.5 },
       { key: 'inflVol', label: 'Inflation volatility (σ)', type: 'percent', min: 0, max: 10, step: 0.25 },

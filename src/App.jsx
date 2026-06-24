@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DEFAULTS, project, survives } from './fireModel';
-import { simulateHistorical, simulateMonteCarlo } from './sim';
+import { minGrossToNotRunOut, simulateHistorical, simulateMonteCarlo } from './sim';
 import InputPanel from './components/InputPanel';
 import NetWorthChart from './components/NetWorthChart';
 import ProjectionTable from './components/ProjectionTable';
@@ -8,6 +8,7 @@ import SummaryCard from './components/SummaryCard';
 import SimChart from './components/SimChart';
 import SimSummary from './components/SimSummary';
 import SimTable from './components/SimTable';
+import SolverBanner from './components/SolverBanner';
 
 const MODES = [
   { id: 'fixed', label: 'Fixed return' },
@@ -52,6 +53,7 @@ export default function App() {
     if (mode === 'montecarlo') return simulateMonteCarlo(config);
     return null;
   }, [config, mode]);
+  const minGross = useMemo(() => minGrossToNotRunOut(config, mode), [config, mode]);
 
   const badge =
     mode === 'fixed'
@@ -88,6 +90,12 @@ export default function App() {
       <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
         <InputPanel config={config} setField={setField} onReset={reset} mode={mode} />
         <main className="flex-1 space-y-5 overflow-y-auto p-5">
+          <SolverBanner
+            minGross={minGross}
+            mode={mode}
+            sim={sim}
+            onApply={(net) => setField('incomeToday', net)}
+          />
           {mode === 'fixed' ? (
             <>
               <SummaryCard rows={rows} survives={ok} config={config} />

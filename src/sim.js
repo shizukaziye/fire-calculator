@@ -6,7 +6,7 @@
 //
 // Both return the same shape so the UI can render either identically.
 
-import { DEFAULTS, project } from './fireModel.js';
+import { DEFAULTS, project, survives, takeHome } from './fireModel.js';
 import { HISTORICAL } from './historicalData.js';
 
 const survivesRows = (rows) => !rows.some((r) => r.depleted);
@@ -112,4 +112,45 @@ export function simulateMonteCarlo(cfg = {}) {
     paths.push(project(c, { returns, inflations }));
   }
   return summarize(c, paths, { horizon: years });
+}
+
+// Success-rate bar the solved salary must clear in each sim mode. 100% of random
+// Monte Carlo paths is effectively unreachable (there's always a doomsday tail),
+// so MC uses the conventional 95% bar; historical uses every actual sequence.
+export const MIN_SALARY_TARGET = { historical: 1, montecarlo: 0.95 };
+
+// Lowest GROSS salary (today $) whose take-home keeps the plan from running out,
+// solved in the current mode's terms:
+//   fixed      -> the deterministic projection survives
+//   historical -> every 1928–2025 sequence survives (100%)
+//   montecarlo -> 95% of paths survive
+// Income only matters while working, and survival is monotonic in income, so a
+// clean threshold exists. Returns 0 if $0 already survives, or Infinity if no
+// salary can fix it (e.g. no working years left). Rounded up to the nearest $1k.
+export function minGrossToNotRunOut(cfg = {}, mode = 'fixed') {
+  const c = { ...DEFAULTS, ...cfg };
+
+  // Cap the solver's MC trials so the binary search stays snappy; the seed is
+  // fixed so the threshold is still stable.
+  const solverTrials = Math.min(c.trials, 400);
+
+  const passes = (gross) => {
+    const test = { ...c, incomeToday: takeHome(gross) };
+    if (mode === 'historical') return simulateHistorical(test).successRate >= MIN_SALARY_TARGET.historical;
+    if (mode === 'montecarlo') return simulateMonteCarlo({ ...test, trials: solverTrials }).successRate >= MIN_SALARY_TARGET.montecarlo;
+    return survives(test);
+  };
+
+  if (passes(0)) return 0;
+  const HI = 3_000_000;
+  if (!passes(HI)) return Infinity;
+
+  let lo = 0;
+  let hi = HI;
+  while (hi - lo > 1000) {
+    const mid = (lo + hi) / 2;
+    if (passes(mid)) hi = mid;
+    else lo = mid;
+  }
+  return Math.ceil(hi / 1000) * 1000;
 }

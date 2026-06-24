@@ -46,12 +46,42 @@ const MARKET_NOTE = {
     'In Monte Carlo mode these are the MEANS each year is drawn around (see Monte Carlo settings).',
 };
 
+function Chevron({ open }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`transition-transform ${open ? 'rotate-90' : ''}`}
+    >
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
 export default function InputPanel({ config, setField, onReset, mode }) {
   const sections = SECTIONS.filter((s) => !s.onlyInMode || s.onlyInMode === mode);
 
+  const [collapsed, setCollapsed] = useState(
+    () => new Set(SECTIONS.filter((s) => s.defaultCollapsed).map((s) => s.id))
+  );
+  const toggle = (id) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  const expandAll = () => setCollapsed(new Set());
+  const collapseAll = () => setCollapsed(new Set(sections.map((s) => s.id)));
+
   return (
     <aside className="w-full shrink-0 overflow-y-auto border-b border-slate-800 p-4 lg:w-[360px] lg:border-b-0 lg:border-r">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
           Inputs
         </h2>
@@ -63,32 +93,53 @@ export default function InputPanel({ config, setField, onReset, mode }) {
           Reset to defaults
         </button>
       </div>
+      <div className="mb-3 flex justify-end gap-3 text-xs text-slate-500">
+        <button type="button" onClick={expandAll} className="hover:text-slate-300">
+          Expand all
+        </button>
+        <span className="text-slate-700">·</span>
+        <button type="button" onClick={collapseAll} className="hover:text-slate-300">
+          Collapse all
+        </button>
+      </div>
 
-      <div className="space-y-5">
-        {sections.map((section) => (
-          <section key={section.id}>
-            <h3 className="mb-1 border-b border-slate-800 pb-1 text-xs font-semibold uppercase tracking-wide text-emerald-400/90">
-              {section.title}
-            </h3>
-            {section.id === 'market' && MARKET_NOTE[mode] && (
-              <p className="mb-1 mt-1 text-xs text-amber-300/80">{MARKET_NOTE[mode]}</p>
-            )}
-            <div className="divide-y divide-slate-800/60">
-              {section.fields.map((field) => (
-                <Field
-                  key={field.key}
-                  field={field}
-                  value={config[field.key]}
-                  disabled={field.disabledWhen ? field.disabledWhen(config) : false}
-                  onChange={(v) => setField(field.key, v)}
-                />
-              ))}
-            </div>
-            {section.id === 'income' && (
-              <TakeHomeHelper onApply={(v) => setField('incomeToday', v)} />
-            )}
-          </section>
-        ))}
+      <div className="space-y-3">
+        {sections.map((section) => {
+          const open = !collapsed.has(section.id);
+          return (
+            <section key={section.id}>
+              <button
+                type="button"
+                onClick={() => toggle(section.id)}
+                className="flex w-full items-center gap-1.5 border-b border-slate-800 pb-1 text-left text-xs font-semibold uppercase tracking-wide text-emerald-400/90 hover:text-emerald-300"
+              >
+                <Chevron open={open} />
+                <span>{section.title}</span>
+              </button>
+              {open && (
+                <>
+                  {section.id === 'market' && MARKET_NOTE[mode] && (
+                    <p className="mb-1 mt-1 text-xs text-amber-300/80">{MARKET_NOTE[mode]}</p>
+                  )}
+                  <div className="divide-y divide-slate-800/60">
+                    {section.fields.map((field) => (
+                      <Field
+                        key={field.key}
+                        field={field}
+                        value={config[field.key]}
+                        disabled={field.disabledWhen ? field.disabledWhen(config) : false}
+                        onChange={(v) => setField(field.key, v)}
+                      />
+                    ))}
+                  </div>
+                  {section.id === 'income' && (
+                    <TakeHomeHelper onApply={(v) => setField('incomeToday', v)} />
+                  )}
+                </>
+              )}
+            </section>
+          );
+        })}
       </div>
     </aside>
   );
