@@ -23,7 +23,7 @@ export const DEFAULTS = {
   // --- starting balances (today $) — consolidated by tax treatment ---
   taxable: 1_730_000,     // brokerage + cash + misc — accessible anytime
   roth: 765_000,          // ALL Roth (IRA + 401k), total balance
-  rothContrib: 131_000,   // of that Roth, the CONTRIBUTIONS — withdrawable anytime.
+  rothContrib: 289_000,   // of that Roth, the CONTRIBUTIONS — withdrawable anytime.
                           // The rest (earnings) is locked until 59.5, like a 401k.
   pretax: 436_000,        // ALL pre-tax / traditional (401k + IRA) — locked till 59.5, OR Roth-ladder from retireAge+5
   hsa: 45_000,            // medical / age 65 (modeled with the locked bucket)
