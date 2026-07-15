@@ -33,8 +33,9 @@ three modes:
 - **Big decisions bar**: the headline choices — stay single vs marry (and
   when), number of kids, rent vs buy (and when) — sit above the charts;
   the left panel keeps the granular inputs.
-- **Staged spending**: solo → married → family lifestyle levels keyed to the
-  marriage / kid ages, plus staggered college later.
+- **Additive household spending**: your base lifestyle + an amount per spouse
+  (from the marriage age) + an amount per kid (from each kid's arrival, so it
+  scales to any family size), plus staggered college later.
 - **Per-person health**, stacked on top of lifestyle: you and spouse each
   step employer plan → ACA → Medicare, each kid costs a set amount until
   they leave your plan (default kid-age 26).

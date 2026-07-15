@@ -68,9 +68,9 @@ export const SECTIONS = [
     id: 'spending',
     title: 'Spending (today $, outside housing)',
     fields: [
-      { key: 'lifestyleSolo', label: 'Lifestyle — solo', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
-      { key: 'lifestyleMarried', label: 'Lifestyle — married', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
-      { key: 'lifestyleFamily', label: 'Lifestyle — with kid', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
+      { key: 'lifestyleSolo', label: 'Lifestyle — you (base)', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
+      { key: 'lifestylePerSpouse', label: 'Lifestyle — + spouse', type: 'dollarMonthly', min: 0, max: 20_000, step: 100, disabledWhen: (c) => !c.willMarry },
+      { key: 'lifestylePerKid', label: 'Lifestyle — + each kid', type: 'dollarMonthly', min: 0, max: 20_000, step: 100, disabledWhen: (c) => c.numKids === 0 },
     ],
   },
   {

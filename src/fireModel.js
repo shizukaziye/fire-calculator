@@ -36,10 +36,10 @@ export const DEFAULTS = {
   // For a salary, run takeHome(grossSalary) to get this number.
   incomeToday: 100_000,
 
-  // --- spending stages, today $, OUTSIDE housing ---
-  lifestyleSolo: 36_000,     // until marriageAge
-  lifestyleMarried: 60_000,  // marriageAge until the kid arrives
-  lifestyleFamily: 84_000,   // from kidAtAge (if numKids > 0)
+  // --- spending, today $, OUTSIDE housing — additive per person ---
+  lifestyleSolo: 36_000,      // your baseline ($3k/mo)
+  lifestylePerSpouse: 24_000, // added from marriageAge (+$2k/mo)
+  lifestylePerKid: 24_000,    // added per kid from that kid's arrival (+$2k/mo each)
 
   // --- health, today $/yr, PER PERSON — stacked ON TOP of lifestyle ---
   // (the staged lifestyle numbers above exclude insurance). Adults step
@@ -225,8 +225,11 @@ export function project(cfg = {}, seq) {
 
     const married = c.willMarry && age >= c.marriageAge;
     const single = !married; // filing status
-    const hasKids = c.numKids > 0 && age >= c.kidAtAge;
-    const stage = hasKids ? 'family' : married ? 'married' : 'solo';
+    let kidsBorn = 0;
+    for (let i = 0; i < c.numKids; i++) {
+      if (age >= c.kidAtAge + i * c.kidSpacingYears) kidsBorn++;
+    }
+    const stage = kidsBorn > 0 ? 'family' : married ? 'married' : 'solo';
     const working = age < c.retireAge;
     const pretaxOpen = age >= ladderAge;  // pre-tax: Roth ladder (retire+5) or 59.5
     const rothOpen = age >= 59.5;         // Roth earnings: always 59.5
@@ -264,7 +267,7 @@ export function project(cfg = {}, seq) {
     }
 
     const lifestyle =
-      stage === 'solo' ? c.lifestyleSolo : stage === 'family' ? c.lifestyleFamily : c.lifestyleMarried;
+      c.lifestyleSolo + (married ? c.lifestylePerSpouse : 0) + kidsBorn * c.lifestylePerKid;
 
     // health: per person — you (+ spouse once married) step employer -> ACA ->
     // Medicare; each kid costs healthPerKid from birth until kidCoveredToAge.

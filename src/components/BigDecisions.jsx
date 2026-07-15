@@ -19,7 +19,7 @@ const scaleGroup = (config, anchorKey, otherKeys, newAnchor) => {
   return patch;
 };
 
-const LIFE_KNOB = { key: 'lifestyleSolo', label: 'Lifestyle cost (solo)', type: 'dollarMonthly', min: 0, max: 15_000, step: 100 };
+const LIFE_KNOB = { key: 'lifestyleSolo', label: 'Lifestyle cost (your base)', type: 'dollarMonthly', min: 0, max: 15_000, step: 100 };
 const HOUSE_KNOB = { key: 'rentFamily', label: 'Housing cost (3BR rent)', type: 'dollarMonthly', min: 0, max: 12_000, step: 50 };
 
 const mo = (annual) => '$' + Math.round(annual / 12).toLocaleString() + '/mo';
@@ -168,13 +168,13 @@ export default function BigDecisions({ config, setField, setFields }) {
             field={LIFE_KNOB}
             value={config.lifestyleSolo}
             onChange={(v) =>
-              setFields(scaleGroup(config, 'lifestyleSolo', ['lifestyleMarried', 'lifestyleFamily'], v))
+              setFields(scaleGroup(config, 'lifestyleSolo', ['lifestylePerSpouse', 'lifestylePerKid'], v))
             }
           />
           <p className="text-xs text-slate-500">
-            One knob for all lifestyle sliders — currently married{' '}
-            <span className="text-slate-400">{mo(config.lifestyleMarried)}</span> · with kid{' '}
-            <span className="text-slate-400">{mo(config.lifestyleFamily)}</span> scale with it.
+            One knob for all lifestyle sliders — + spouse{' '}
+            <span className="text-slate-400">{mo(config.lifestylePerSpouse)}</span> · + each kid{' '}
+            <span className="text-slate-400">{mo(config.lifestylePerKid)}</span> scale with it.
           </p>
         </div>
         <div>
