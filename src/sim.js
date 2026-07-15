@@ -1,8 +1,10 @@
 // Simulation layer on top of the deterministic project().
 // - Historical: roll the actual 1928–2025 return/inflation series through the
 //   plan, one sequence per possible start year (sequence-of-returns backtest).
-// - Monte Carlo: draw each year's nominal return and inflation from a normal
-//   distribution (mean = your assumptions, std dev = the vol inputs).
+// - Monte Carlo: draw each year's nominal return lognormally around your
+//   assumption (median growth = the deterministic 9%-style compounding, so the
+//   median MC path matches the fixed-return projection) and inflation from a
+//   normal distribution.
 //
 // Both return the same shape so the UI can render either identically.
 
@@ -100,13 +102,13 @@ export function simulateMonteCarlo(cfg = {}) {
   const years = c.endAge - c.currentAge + 1;
   const trials = Math.max(1, Math.round(c.trials));
   const rng = mulberry32(0x9e3779b9); // fixed seed → reproducible
+  const mu = Math.log(1 + c.nominalReturn); // lognormal: median (1+r) = 1 + nominalReturn
   const paths = [];
   for (let t = 0; t < trials; t++) {
     const returns = new Array(years);
     const inflations = new Array(years);
     for (let y = 0; y < years; y++) {
-      // floor at -90% so a rare deep-tail draw can't flip the portfolio sign
-      returns[y] = Math.max(-0.9, c.nominalReturn + c.returnVol * gauss(rng));
+      returns[y] = Math.exp(mu + c.returnVol * gauss(rng)) - 1;
       inflations[y] = Math.max(-0.1, c.inflation + c.inflVol * gauss(rng));
     }
     paths.push(project(c, { returns, inflations }));

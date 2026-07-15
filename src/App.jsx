@@ -4,6 +4,7 @@ import { minGrossToNotRunOut, simulateHistorical, simulateMonteCarlo } from './s
 import InputPanel from './components/InputPanel';
 import NetWorthChart from './components/NetWorthChart';
 import ProjectionTable from './components/ProjectionTable';
+import RentVsBuy from './components/RentVsBuy';
 import SummaryCard from './components/SummaryCard';
 import SimChart from './components/SimChart';
 import SimSummary from './components/SimSummary';
@@ -70,7 +71,7 @@ export default function App() {
         <div>
           <h1 className="text-lg font-semibold">FIRE Calculator</h1>
           <p className="text-xs text-slate-400">
-            Year-by-year projection — buckets, Roth ladder, housing, college, SS &amp; inflation
+            Year-by-year projection — buckets, cap-gains withdrawals, Roth ladder, rent vs buy, college, SS &amp; inflation
           </p>
         </div>
         <ModeTabs mode={mode} onChange={setMode} />
@@ -100,6 +101,7 @@ export default function App() {
             <>
               <SummaryCard rows={rows} survives={ok} config={config} />
               <NetWorthChart rows={rows} dollars={dollars} onToggle={setDollars} />
+              <RentVsBuy config={config} dollars={dollars} />
               <ProjectionTable rows={rows} dollars={dollars} />
             </>
           ) : (

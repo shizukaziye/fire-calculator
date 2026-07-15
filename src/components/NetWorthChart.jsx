@@ -49,6 +49,7 @@ function NwTooltip({ active, payload, label }) {
     <div className="rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-xs">
       <div className="mb-1 font-medium text-slate-200">Age {label}</div>
       {row('Net worth', d.total, '#34d399')}
+      {row('After-tax', d.afterTax, '#f59e0b')}
       {row('Usable now', d.usable, '#38bdf8')}
       {locked > 0 && row('Locked', locked, '#94a3b8')}
     </div>
@@ -59,6 +60,7 @@ export default function NetWorthChart({ rows, dollars, onToggle }) {
   const data = rows.map((r) => ({
     age: r.age,
     total: dollars === 'today' ? r.netWorthToday : r.netWorthNominal,
+    afterTax: dollars === 'today' ? r.afterTaxToday : r.afterTaxNominal,
     usable: dollars === 'today' ? Math.round(r.usable / r.infl) : r.usable,
   }));
 
@@ -95,12 +97,22 @@ export default function NetWorthChart({ rows, dollars, onToggle }) {
             dot={false}
             isAnimationActive={false}
           />
+          <Line
+            type="monotone"
+            dataKey="afterTax"
+            name="After-tax (liquidation)"
+            stroke="#f59e0b"
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
         </LineChart>
       </ResponsiveContainer>
       <p className="mt-2 text-xs text-slate-500">
-        The gap between the two lines is your locked retirement money — pre-tax
-        401k/IRA + Roth earnings + HSA — not spendable until the Roth ladder or
-        age 59.5 opens it up.
+        The gap between total and usable is your locked retirement money —
+        pre-tax 401k/IRA + Roth earnings + HSA — not spendable until the Roth
+        ladder or age 59.5 opens it up. After-tax is what liquidating everything
+        would actually net after the cap-gains and pre-tax haircuts.
       </p>
     </section>
   );
