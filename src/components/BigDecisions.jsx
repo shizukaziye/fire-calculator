@@ -2,6 +2,29 @@
 // pulled out of the granular left panel so the big levers sit above the charts.
 // They edit the same config keys, so everything stays in sync.
 
+import { DEFAULTS } from '../fireModel';
+import Field from './Field';
+
+// Master knobs: drag one number and its whole group scales proportionally
+// (preserving whatever ratios the granular sliders currently hold, so those
+// sliders visibly move with the knob). If the anchor sits at 0 the current
+// ratios are unknowable — fall back to the DEFAULTS ratios.
+const scaleGroup = (config, anchorKey, otherKeys, newAnchor) => {
+  const old = config[anchorKey];
+  const patch = { [anchorKey]: newAnchor };
+  for (const k of otherKeys) {
+    patch[k] =
+      old > 0 ? (config[k] * newAnchor) / old : (DEFAULTS[k] * newAnchor) / DEFAULTS[anchorKey];
+  }
+  return patch;
+};
+
+const LIFE_KNOB = { key: 'lifestyleSolo', label: 'Lifestyle cost (solo)', type: 'dollarMonthly', min: 0, max: 15_000, step: 100 };
+const HOUSE_KNOB = { key: 'rentFamily', label: 'Housing cost (3BR rent)', type: 'dollarMonthly', min: 0, max: 12_000, step: 50 };
+
+const mo = (annual) => '$' + Math.round(annual / 12).toLocaleString() + '/mo';
+const usd = (n) => '$' + Math.round(n).toLocaleString();
+
 function Segmented({ value, options, onChange }) {
   return (
     <div className="inline-flex overflow-hidden rounded-md border border-slate-700">
@@ -69,7 +92,7 @@ function Decision({ label, children }) {
   );
 }
 
-export default function BigDecisions({ config, setField }) {
+export default function BigDecisions({ config, setField, setFields }) {
   const retiredNow = config.retireAge <= config.currentAge;
   return (
     <section className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
@@ -137,6 +160,36 @@ export default function BigDecisions({ config, setField }) {
             onChange={(v) => setField('buyAge', v)}
           />
         </Decision>
+      </div>
+
+      <div className="mt-4 grid gap-x-10 gap-y-2 border-t border-slate-800 pt-2 lg:grid-cols-2">
+        <div>
+          <Field
+            field={LIFE_KNOB}
+            value={config.lifestyleSolo}
+            onChange={(v) =>
+              setFields(scaleGroup(config, 'lifestyleSolo', ['lifestyleMarried', 'lifestyleFamily'], v))
+            }
+          />
+          <p className="text-xs text-slate-500">
+            One knob for all lifestyle sliders — currently married{' '}
+            <span className="text-slate-400">{mo(config.lifestyleMarried)}</span> · with kid{' '}
+            <span className="text-slate-400">{mo(config.lifestyleFamily)}</span> scale with it.
+          </p>
+        </div>
+        <div>
+          <Field
+            field={HOUSE_KNOB}
+            value={config.rentFamily}
+            onChange={(v) => setFields(scaleGroup(config, 'rentFamily', ['rentSolo', 'housePrice'], v))}
+          />
+          <p className="text-xs text-slate-500">
+            One knob for the housing market — 2BR rent{' '}
+            <span className="text-slate-400">{mo(config.rentSolo)}</span> · house price{' '}
+            <span className="text-slate-400">{usd(config.housePrice)}</span> scale with it
+            (price-to-rent stays put).
+          </p>
+        </div>
       </div>
       {retiredNow && (
         <p className="mt-3 border-t border-slate-800 pt-2.5 text-xs text-amber-300/90">

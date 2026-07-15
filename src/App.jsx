@@ -45,6 +45,7 @@ export default function App() {
   const [dollars, setDollars] = useState('today'); // 'today' | 'nominal'
 
   const setField = (key, value) => setConfig((c) => ({ ...c, [key]: value }));
+  const setFields = (patch) => setConfig((c) => ({ ...c, ...patch }));
   const reset = () => setConfig({ ...DEFAULTS });
 
   // Recompute live on every input change.
@@ -92,7 +93,7 @@ export default function App() {
       <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
         <InputPanel config={config} setField={setField} onReset={reset} mode={mode} />
         <main className="flex-1 space-y-5 overflow-y-auto p-5">
-          <BigDecisions config={config} setField={setField} />
+          <BigDecisions config={config} setField={setField} setFields={setFields} />
           <SolverBanner
             minGross={minGross}
             mode={mode}
