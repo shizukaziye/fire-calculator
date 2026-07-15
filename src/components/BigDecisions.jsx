@@ -70,9 +70,27 @@ function Decision({ label, children }) {
 }
 
 export default function BigDecisions({ config, setField }) {
+  const retiredNow = config.retireAge <= config.currentAge;
   return (
     <section className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
       <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
+        <Decision label="Ages">
+          <AgeInput
+            label="now"
+            value={config.currentAge}
+            onChange={(v) => setField('currentAge', v)}
+          />
+          <AgeInput
+            label="retire at"
+            value={config.retireAge}
+            onChange={(v) => setField('retireAge', v)}
+          />
+          {retiredNow && (
+            <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-300">
+              retired
+            </span>
+          )}
+        </Decision>
         <Decision label="Household">
           <Segmented
             value={config.willMarry}
@@ -120,6 +138,13 @@ export default function BigDecisions({ config, setField }) {
           />
         </Decision>
       </div>
+      {retiredNow && (
+        <p className="mt-3 border-t border-slate-800 pt-2.5 text-xs text-amber-300/90">
+          You&apos;re already retired in this plan — no more earned income, so the
+          projection is a stress test of whether the portfolio alone holds to{' '}
+          {config.endAge}. The income input is ignored.
+        </p>
+      )}
     </section>
   );
 }

@@ -25,9 +25,8 @@ export const SECTIONS = [
     id: 'timeline',
     title: 'Timeline',
     fields: [
-      { key: 'currentAge', label: 'Current age', type: 'number', min: 18, max: 70, step: 1 },
-      { key: 'retireAge', label: 'Retire age (income → 0)', type: 'number', min: 25, max: 80, step: 1 },
-      { key: 'kidAtAge', label: 'Your age when kid arrives', type: 'number', min: 18, max: 60, step: 1, disabledWhen: (c) => c.numKids === 0 },
+      // current/retire age, marriage, kids, and rent-vs-buy live in the
+      // BigDecisions bar above the charts
       { key: 'endAge', label: 'Plan through age', type: 'number', min: 70, max: 110, step: 1 },
     ],
   },
