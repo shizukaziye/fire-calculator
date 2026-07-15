@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { DEFAULTS, project, survives } from './fireModel';
 import { minGrossToNotRunOut, simulateHistorical, simulateMonteCarlo } from './sim';
+import BigDecisions from './components/BigDecisions';
 import InputPanel from './components/InputPanel';
 import NetWorthChart from './components/NetWorthChart';
 import ProjectionTable from './components/ProjectionTable';
@@ -91,6 +92,7 @@ export default function App() {
       <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
         <InputPanel config={config} setField={setField} onReset={reset} mode={mode} />
         <main className="flex-1 space-y-5 overflow-y-auto p-5">
+          <BigDecisions config={config} setField={setField} />
           <SolverBanner
             minGross={minGross}
             mode={mode}

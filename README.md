@@ -30,8 +30,14 @@ three modes:
 - **Filing status timeline**: single until the marriage age, MFJ after —
   brackets and deductions halve while single, which is what makes a big
   down-payment withdrawal before marriage expensive.
+- **Big decisions bar**: the headline choices — stay single vs marry (and
+  when), number of kids, rent vs buy (and when) — sit above the charts;
+  the left panel keeps the granular inputs.
 - **Staged spending**: solo → married → family lifestyle levels keyed to the
   marriage / kid ages, plus staggered college later.
+- **Per-person health**, stacked on top of lifestyle: you and spouse each
+  step employer plan → ACA → Medicare, each kid costs a set amount until
+  they leave your plan (default kid-age 26).
 - **Housing, rent vs buy**: staged rent (2BR solo → 3BR married), or a
   financed-or-cash purchase with live loan amortization, Prop-13 property tax,
   maintenance/insurance, closing + selling costs, home appreciation, and the
@@ -41,8 +47,7 @@ three modes:
 - **After-tax net worth**: liquidation value — taxable less the cap-gains
   haircut on its gain share, pre-tax less an ordinary-rate haircut, home equity
   net of selling costs and gains tax.
-- ACA→Medicare health lines (default 0 — the staged lifestyle figures are
-  assumed to include insurance), Social Security, and inflation throughout.
+- Social Security and inflation throughout.
 
 `scripts/sanity.mjs` checks the engine against the July 2026 planning-session
 baseline (tax on benchmark withdrawals, rent-vs-buy milestones, MC success

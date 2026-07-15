@@ -17,6 +17,7 @@ export const DEFAULTS = {
   currentAge: 32,
   retireAge: 45,          // age you STOP earning (income -> 0)
   endAge: 90,
+  willMarry: true,        // false = single (solo lifestyle, single brackets) forever
   marriageAge: 35,        // single -> MFJ brackets; married spending + 3BR rent start
 
   // --- market assumptions (also the Monte Carlo means) ---
@@ -39,13 +40,19 @@ export const DEFAULTS = {
   lifestyleSolo: 36_000,     // until marriageAge
   lifestyleMarried: 60_000,  // marriageAge until the kid arrives
   lifestyleFamily: 84_000,   // from kidAtAge (if numKids > 0)
-  // Health defaults to 0 because the staged lifestyle numbers above are
-  // assumed to INCLUDE insurance (the Jul-2026 plan's convention). Set these
-  // if you want health broken out on top — the family ACA flag from that
-  // session: unsubsidized ACA for 3 runs ~$18-24k/yr pre-65.
-  healthWorking: 0,       // employer plan while earning
-  healthPre65: 0,         // ACA, retired, before Medicare
-  healthMedicare: 0,      // 65+
+
+  // --- health, today $/yr, PER PERSON — stacked ON TOP of lifestyle ---
+  // (the staged lifestyle numbers above exclude insurance). Adults step
+  // through employer plan -> ACA -> Medicare with your working status / age;
+  // each kid costs healthPerKid while on your plan.
+  healthYouWorking: 3_000,
+  healthYouPre65: 8_000,      // ACA, retired, before Medicare
+  healthYouMedicare: 6_000,   // 65+
+  healthSpouseWorking: 3_000,
+  healthSpousePre65: 8_000,
+  healthSpouseMedicare: 6_000,
+  healthPerKid: 5_000,
+  kidCoveredToAge: 26,        // kid's age when they leave your plan
 
   // --- taxes on withdrawals / liquidation ---
   taxableGainPct: 1.0,    // share of every taxable-account withdrawal that is
@@ -216,8 +223,10 @@ export function project(cfg = {}, seq) {
     hsa *= 1 + ret;
     if (homeValue > 0) homeValue *= 1 + c.homeAppreciation;
 
-    const single = age < c.marriageAge;
-    const stage = single ? 'solo' : c.numKids > 0 && age >= c.kidAtAge ? 'family' : 'married';
+    const married = c.willMarry && age >= c.marriageAge;
+    const single = !married; // filing status
+    const hasKids = c.numKids > 0 && age >= c.kidAtAge;
+    const stage = hasKids ? 'family' : married ? 'married' : 'solo';
     const working = age < c.retireAge;
     const pretaxOpen = age >= ladderAge;  // pre-tax: Roth ladder (retire+5) or 59.5
     const rothOpen = age >= 59.5;         // Roth earnings: always 59.5
@@ -251,12 +260,27 @@ export function project(cfg = {}, seq) {
         purchasePrice * c.propTaxRate * Math.pow(1.02, age - c.buyAge) +
         c.housePrice * (c.maintRate + c.insRate) * infl;
     } else {
-      housing = (single ? c.rentSolo : c.rentFamily) * infl;
+      housing = (stage === 'solo' ? c.rentSolo : c.rentFamily) * infl;
     }
 
     const lifestyle =
       stage === 'solo' ? c.lifestyleSolo : stage === 'family' ? c.lifestyleFamily : c.lifestyleMarried;
-    const health = (working ? c.healthWorking : age < 65 ? c.healthPre65 : c.healthMedicare) * infl;
+
+    // health: per person — you (+ spouse once married) step employer -> ACA ->
+    // Medicare; each kid costs healthPerKid from birth until kidCoveredToAge.
+    const stageRate = (w, aca, med) => (working ? w : age < 65 ? aca : med);
+    let kidsCovered = 0;
+    for (let i = 0; i < c.numKids; i++) {
+      const born = c.kidAtAge + i * c.kidSpacingYears;
+      if (age >= born && age - born < c.kidCoveredToAge) kidsCovered++;
+    }
+    const health =
+      (stageRate(c.healthYouWorking, c.healthYouPre65, c.healthYouMedicare) +
+        (married
+          ? stageRate(c.healthSpouseWorking, c.healthSpousePre65, c.healthSpouseMedicare)
+          : 0) +
+        kidsCovered * c.healthPerKid) *
+      infl;
     const spend = lifestyle * infl + housing + health + collegeAt(age) * infl;
     const income = (working ? c.incomeToday : 0) * infl;
     const ss = age >= c.ssStartAge ? c.ssAnnual * infl : 0;

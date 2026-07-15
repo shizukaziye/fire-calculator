@@ -13,8 +13,10 @@
 // disabledWhen(cfg) optionally greys out a field based on other inputs.
 // onlyInMode marks a whole section as mode-specific.
 //
-// NOTE: house fields stay editable even when "Buy a home" is off, because the
-// rent-vs-buy comparison always models the buy path with them.
+// NOTE: the headline decisions (marry + when, kids, rent vs buy + when) live
+// in the BigDecisions bar above the charts, not here. House fields stay
+// editable even when the plan rents, because the rent-vs-buy comparison
+// always models the buy path with them.
 
 const noMortgage = (c) => !c.financed;
 
@@ -25,8 +27,7 @@ export const SECTIONS = [
     fields: [
       { key: 'currentAge', label: 'Current age', type: 'number', min: 18, max: 70, step: 1 },
       { key: 'retireAge', label: 'Retire age (income → 0)', type: 'number', min: 25, max: 80, step: 1 },
-      { key: 'marriageAge', label: 'Marriage age (single → MFJ)', type: 'number', min: 18, max: 70, step: 1 },
-      { key: 'kidAtAge', label: 'Your age when kid arrives', type: 'number', min: 18, max: 60, step: 1 },
+      { key: 'kidAtAge', label: 'Your age when kid arrives', type: 'number', min: 18, max: 60, step: 1, disabledWhen: (c) => c.numKids === 0 },
       { key: 'endAge', label: 'Plan through age', type: 'number', min: 70, max: 110, step: 1 },
     ],
   },
@@ -71,9 +72,20 @@ export const SECTIONS = [
       { key: 'lifestyleSolo', label: 'Lifestyle — solo', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
       { key: 'lifestyleMarried', label: 'Lifestyle — married', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
       { key: 'lifestyleFamily', label: 'Lifestyle — with kid', type: 'dollarMonthly', min: 0, max: 20_000, step: 100 },
-      { key: 'healthWorking', label: 'Health — working', type: 'dollar', min: 0, max: 50_000, step: 500 },
-      { key: 'healthPre65', label: 'Health — pre-65 (ACA)', type: 'dollar', min: 0, max: 60_000, step: 500 },
-      { key: 'healthMedicare', label: 'Health — 65+ (Medicare)', type: 'dollar', min: 0, max: 50_000, step: 500 },
+    ],
+  },
+  {
+    id: 'health',
+    title: 'Health (per person, today $/yr)',
+    fields: [
+      { key: 'healthYouWorking', label: 'You — while working', type: 'dollar', min: 0, max: 30_000, step: 500 },
+      { key: 'healthYouPre65', label: 'You — pre-65 (ACA)', type: 'dollar', min: 0, max: 30_000, step: 500 },
+      { key: 'healthYouMedicare', label: 'You — 65+ (Medicare)', type: 'dollar', min: 0, max: 30_000, step: 500 },
+      { key: 'healthSpouseWorking', label: 'Spouse — while working', type: 'dollar', min: 0, max: 30_000, step: 500, disabledWhen: (c) => !c.willMarry },
+      { key: 'healthSpousePre65', label: 'Spouse — pre-65 (ACA)', type: 'dollar', min: 0, max: 30_000, step: 500, disabledWhen: (c) => !c.willMarry },
+      { key: 'healthSpouseMedicare', label: 'Spouse — 65+ (Medicare)', type: 'dollar', min: 0, max: 30_000, step: 500, disabledWhen: (c) => !c.willMarry },
+      { key: 'healthPerKid', label: 'Each kid / yr', type: 'dollar', min: 0, max: 30_000, step: 500, disabledWhen: (c) => c.numKids === 0 },
+      { key: 'kidCoveredToAge', label: 'Kid covered until (kid age)', type: 'number', min: 16, max: 30, step: 1, disabledWhen: (c) => c.numKids === 0 },
     ],
   },
   {
@@ -81,12 +93,10 @@ export const SECTIONS = [
     title: 'Housing',
     defaultCollapsed: true,
     fields: [
-      { key: 'buyHome', label: 'Buy a home (main plan)', type: 'bool' },
       { key: 'rentSolo', label: 'Rent — solo (2BR)', type: 'dollarMonthly', min: 0, max: 12_000, step: 50 },
       { key: 'rentFamily', label: 'Rent — married (3BR)', type: 'dollarMonthly', min: 0, max: 12_000, step: 50 },
       { key: 'housePrice', label: 'House price (today $)', type: 'dollar', min: 0, max: 5_000_000, step: 25_000 },
       { key: 'homeAppreciation', label: 'Home appreciation', type: 'percent', min: 0, max: 10, step: 0.1 },
-      { key: 'buyAge', label: 'Buy at age', type: 'number', min: 18, max: 90, step: 1 },
       { key: 'financed', label: 'Finance with a mortgage', type: 'bool' },
       { key: 'downPct', label: 'Down payment', type: 'percent', min: 0, max: 100, step: 1, disabledWhen: noMortgage },
       { key: 'mortgageRate', label: 'Mortgage rate', type: 'percent', min: 0, max: 12, step: 0.1, disabledWhen: noMortgage },
@@ -104,10 +114,9 @@ export const SECTIONS = [
     title: 'Kids / college',
     defaultCollapsed: true,
     fields: [
-      { key: 'numKids', label: 'Number of kids', type: 'number', min: 0, max: 6, step: 1 },
-      { key: 'collegePerKidPerYear', label: 'College / kid / yr', type: 'dollar', min: 0, max: 200_000, step: 5_000 },
-      { key: 'firstKidCollegeAge', label: 'Your age at 1st kid college', type: 'number', min: 30, max: 80, step: 1 },
-      { key: 'kidSpacingYears', label: 'Years between kids', type: 'number', min: 0, max: 10, step: 1 },
+      { key: 'collegePerKidPerYear', label: 'College / kid / yr', type: 'dollar', min: 0, max: 200_000, step: 5_000, disabledWhen: (c) => c.numKids === 0 },
+      { key: 'firstKidCollegeAge', label: 'Your age at 1st kid college', type: 'number', min: 30, max: 80, step: 1, disabledWhen: (c) => c.numKids === 0 },
+      { key: 'kidSpacingYears', label: 'Years between kids', type: 'number', min: 0, max: 10, step: 1, disabledWhen: (c) => c.numKids < 2 },
     ],
   },
   {
