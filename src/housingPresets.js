@@ -17,8 +17,9 @@
 // starting points, not gospel, and fine-tune in the Housing panel.
 //
 // Curation bias, on purpose: heavy on Asian-food/boba-dense, family-friendly
-// suburbs (South Bay, Tri-Valley, 880 corridor, San Gabriel Valley, north
-// Orange County, southwest Las Vegas) since that's the actual search space.
+// suburbs (South Bay, Peninsula, Tri-Valley, 880 corridor, Sacramento region,
+// San Gabriel Valley, north Orange County, southwest Las Vegas) since that's
+// the actual search space.
 
 export const HOUSING_PRESETS = [
   // --- Bay Area: South Bay / Peninsula ---
@@ -26,6 +27,19 @@ export const HOUSING_PRESETS = [
   { id: 'santa-clara', metro: 'Bay Area', name: 'Santa Clara', price: 1_850_000, rent3br: 4_900, rent2br: 3_200 },
   { id: 'sunnyvale', metro: 'Bay Area', name: 'Sunnyvale', price: 2_350_000, rent3br: 5_600, rent2br: 3_500 },
   { id: 'san-jose', metro: 'Bay Area', name: 'San Jose', price: 1_600_000, rent3br: 4_800, rent2br: 3_100 },
+
+  // --- Bay Area: Peninsula (San Mateo County) — pricey, but strong Asian-food
+  //     scenes in Millbrae, Foster City, Daly City ---
+  { id: 'san-mateo', metro: 'Bay Area', name: 'San Mateo', price: 1_900_000, rent3br: 5_200, rent2br: 3_300 },
+  { id: 'burlingame', metro: 'Bay Area', name: 'Burlingame', price: 2_300_000, rent3br: 5_700, rent2br: 3_500 },
+  { id: 'san-carlos', metro: 'Bay Area', name: 'San Carlos', price: 2_200_000, rent3br: 5_500, rent2br: 3_400 },
+  { id: 'belmont', metro: 'Bay Area', name: 'Belmont', price: 2_050_000, rent3br: 5_300, rent2br: 3_300 },
+  { id: 'foster-city', metro: 'Bay Area', name: 'Foster City', price: 2_000_000, rent3br: 5_400, rent2br: 3_400 },
+  { id: 'redwood-city', metro: 'Bay Area', name: 'Redwood City', price: 1_800_000, rent3br: 5_100, rent2br: 3_300 },
+  { id: 'millbrae', metro: 'Bay Area', name: 'Millbrae', price: 2_050_000, rent3br: 5_300, rent2br: 3_300 },
+  { id: 'san-bruno', metro: 'Bay Area', name: 'San Bruno', price: 1_350_000, rent3br: 4_400, rent2br: 2_900 },
+  { id: 'south-san-francisco', metro: 'Bay Area', name: 'South San Francisco', price: 1_350_000, rent3br: 4_400, rent2br: 2_900 },
+  { id: 'daly-city', metro: 'Bay Area', name: 'Daly City', price: 1_300_000, rent3br: 4_300, rent2br: 2_800 },
 
   // --- Bay Area: East Bay / 880 corridor ---
   { id: 'fremont', metro: 'Bay Area', name: 'Fremont', price: 1_450_000, rent3br: 4_500, rent2br: 2_900 },
@@ -48,6 +62,19 @@ export const HOUSING_PRESETS = [
   // --- Bay Area: reference tiers ---
   { id: 'bay-cheap-tier', metro: 'Bay Area', name: 'Concord–Hayward 2,000 sqft tier', price: 950_000, rent3br: 3_600, rent2br: 2_700 },
   { id: 'san-francisco', metro: 'Bay Area', name: 'San Francisco', price: 1_700_000, rent3br: 5_800, rent2br: 3_400 },
+
+  // --- Sacramento region — the classic Bay Area cash-out move: ~1/3 the house
+  //     price, still California (drivable to the Bay). Elk Grove / Natomas are
+  //     the Asian-food + family-suburb picks; Davis is the UC college town. ---
+  { id: 'sacramento', metro: 'Sacramento', name: 'Sacramento (city avg)', price: 525_000, rent3br: 2_450, rent2br: 1_750 },
+  { id: 'elk-grove', metro: 'Sacramento', name: 'Elk Grove', price: 640_000, rent3br: 2_850, rent2br: 1_950 },
+  { id: 'natomas', metro: 'Sacramento', name: 'Natomas', price: 560_000, rent3br: 2_600, rent2br: 1_800 },
+  { id: 'roseville', metro: 'Sacramento', name: 'Roseville', price: 650_000, rent3br: 2_900, rent2br: 1_950 },
+  { id: 'rocklin', metro: 'Sacramento', name: 'Rocklin', price: 680_000, rent3br: 2_950, rent2br: 1_950 },
+  { id: 'folsom', metro: 'Sacramento', name: 'Folsom', price: 740_000, rent3br: 3_050, rent2br: 2_050 },
+  { id: 'davis', metro: 'Sacramento', name: 'Davis', price: 800_000, rent3br: 3_100, rent2br: 2_150 },
+  { id: 'rancho-cordova', metro: 'Sacramento', name: 'Rancho Cordova', price: 530_000, rent3br: 2_500, rent2br: 1_700 },
+  { id: 'citrus-heights', metro: 'Sacramento', name: 'Citrus Heights (budget)', price: 480_000, rent3br: 2_300, rent2br: 1_600 },
 
   // --- Los Angeles ---
   { id: 'la-average', metro: 'Los Angeles', name: 'LA average (county)', price: 1_200_000, rent3br: 4_700, rent2br: 2_900 },
@@ -89,7 +116,7 @@ export const HOUSING_PRESETS = [
   { id: 'centennial-hills', metro: 'Las Vegas', name: 'Centennial Hills', price: 520_000, rent3br: 2_250, rent2br: 1_450 },
 ];
 
-export const METROS = ['Bay Area', 'Los Angeles', 'Orange County', 'Las Vegas'];
+export const METROS = ['Bay Area', 'Sacramento', 'Los Angeles', 'Orange County', 'Las Vegas'];
 
 // Config patch for a preset (rents are stored annual). housingPresetId is
 // carried in the config so the dropdown reflects what was actually picked —
