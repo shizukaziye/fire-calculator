@@ -65,8 +65,8 @@ function HousingPreset({ config, setFields }) {
       <p className="mt-1.5 text-xs text-slate-500">
         Sets house <span className="text-slate-400">{usd(config.housePrice)}</span> · 3BR{' '}
         <span className="text-slate-400">{mo(config.rentFamily)}</span> · 2BR{' '}
-        <span className="text-slate-400">{mo(config.rentSolo)}</span> — mid-2026 medians,
-        fine-tune in the Housing panel.
+        <span className="text-slate-400">{mo(config.rentSolo)}</span> — 3BR ~2,000 sqft
+        estimates off mid-2026 medians, fine-tune in the Housing panel.
       </p>
     </div>
   );

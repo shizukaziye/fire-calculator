@@ -60,11 +60,12 @@ export const DEFAULTS = {
                           // gain — the conservative "tax everything" rule)
   pretaxHaircut: 0.30,    // liquidation haircut on pre-tax (ordinary fed+CA approx)
 
-  // --- housing (defaults = the "LA average" preset in housingPresets.js) ---
+  // --- housing (defaults = the "LA average" preset in housingPresets.js;
+  //     house/3BR figures are for the plan's 3BR ~2,000 sqft spec) ---
   buyHome: false,         // false = rent the whole way (no purchase, no mortgage)
   rentSolo: 34_800,       // 2BR while solo ($2,900/mo today $)
-  rentFamily: 54_000,     // 3BR once married/kids ($4,500/mo today $)
-  housePrice: 940_000,    // today $; drifts at homeAppreciation until you buy
+  rentFamily: 56_400,     // 3BR ~2,000 sqft house once married/kids ($4,700/mo)
+  housePrice: 1_200_000,  // today $; drifts at homeAppreciation until you buy
   homeAppreciation: 0.04, // house value growth (base case = inflation)
   buyAge: 35,
   financed: true,         // true = mortgage; false = pay cash
