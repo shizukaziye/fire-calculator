@@ -55,7 +55,7 @@ function HousingPreset({ config, setFields }) {
             <optgroup key={metro} label={metro}>
               {HOUSING_PRESETS.filter((p) => p.metro === metro).map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} — {usd(p.price)}
+                  {p.name} — ${p.rent3br.toLocaleString()}/mo 3BR
                 </option>
               ))}
             </optgroup>
