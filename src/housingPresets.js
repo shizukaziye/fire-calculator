@@ -49,19 +49,20 @@ export const HOUSING_PRESETS = [
   { id: 'bay-cheap-tier', metro: 'Bay Area', name: 'Concord–Hayward 2,000 sqft tier', price: 950_000, rent3br: 3_600, rent2br: 2_700 },
   { id: 'san-francisco', metro: 'Bay Area', name: 'San Francisco', price: 1_700_000, rent3br: 5_800, rent2br: 3_400 },
 
-  // --- San Gabriel Valley (LA) — the Asian-food capital corridor ---
-  { id: 'alhambra', metro: 'San Gabriel Valley (LA)', name: 'Alhambra', price: 1_250_000, rent3br: 4_200, rent2br: 2_500 },
-  { id: 'monterey-park', metro: 'San Gabriel Valley (LA)', name: 'Monterey Park', price: 1_200_000, rent3br: 4_100, rent2br: 2_400 },
-  { id: 'san-gabriel', metro: 'San Gabriel Valley (LA)', name: 'San Gabriel', price: 1_300_000, rent3br: 4_300, rent2br: 2_500 },
-  { id: 'rosemead', metro: 'San Gabriel Valley (LA)', name: 'Rosemead', price: 1_150_000, rent3br: 3_900, rent2br: 2_300 },
-  { id: 'temple-city', metro: 'San Gabriel Valley (LA)', name: 'Temple City', price: 1_400_000, rent3br: 4_500, rent2br: 2_600 },
-  { id: 'arcadia', metro: 'San Gabriel Valley (LA)', name: 'Arcadia', price: 1_650_000, rent3br: 5_100, rent2br: 2_900 },
-  { id: 'pasadena', metro: 'San Gabriel Valley (LA)', name: 'Pasadena', price: 1_500_000, rent3br: 5_100, rent2br: 2_900 },
-  { id: 'rowland-heights', metro: 'San Gabriel Valley (LA)', name: 'Rowland Heights', price: 1_200_000, rent3br: 4_100, rent2br: 2_500 },
-  { id: 'diamond-bar', metro: 'San Gabriel Valley (LA)', name: 'Diamond Bar', price: 1_150_000, rent3br: 4_200, rent2br: 2_600 },
-
-  // --- Los Angeles (rest of the county) ---
+  // --- Los Angeles ---
   { id: 'la-average', metro: 'Los Angeles', name: 'LA average (county)', price: 1_200_000, rent3br: 4_700, rent2br: 2_900 },
+  // San Gabriel Valley (the Asian-food capital corridor):
+  { id: 'alhambra', metro: 'Los Angeles', name: 'Alhambra', price: 1_250_000, rent3br: 4_200, rent2br: 2_500 },
+  { id: 'monterey-park', metro: 'Los Angeles', name: 'Monterey Park', price: 1_200_000, rent3br: 4_100, rent2br: 2_400 },
+  { id: 'san-gabriel', metro: 'Los Angeles', name: 'San Gabriel', price: 1_300_000, rent3br: 4_300, rent2br: 2_500 },
+  { id: 'rosemead', metro: 'Los Angeles', name: 'Rosemead', price: 1_150_000, rent3br: 3_900, rent2br: 2_300 },
+  { id: 'temple-city', metro: 'Los Angeles', name: 'Temple City', price: 1_400_000, rent3br: 4_500, rent2br: 2_600 },
+  { id: 'arcadia', metro: 'Los Angeles', name: 'Arcadia', price: 1_650_000, rent3br: 5_100, rent2br: 2_900 },
+  { id: 'pasadena', metro: 'Los Angeles', name: 'Pasadena', price: 1_500_000, rent3br: 5_100, rent2br: 2_900 },
+  { id: 'rowland-heights', metro: 'Los Angeles', name: 'Rowland Heights', price: 1_200_000, rent3br: 4_100, rent2br: 2_500 },
+  { id: 'diamond-bar', metro: 'Los Angeles', name: 'Diamond Bar', price: 1_150_000, rent3br: 4_200, rent2br: 2_600 },
+
+  // --- Los Angeles: rest of the county ---
   { id: 'long-beach', metro: 'Los Angeles', name: 'Long Beach', price: 1_150_000, rent3br: 4_200, rent2br: 2_500 },
   { id: 'glendale', metro: 'Los Angeles', name: 'Glendale', price: 1_450_000, rent3br: 4_900, rent2br: 2_800 },
   { id: 'burbank', metro: 'Los Angeles', name: 'Burbank', price: 1_350_000, rent3br: 4_800, rent2br: 2_700 },
@@ -88,13 +89,7 @@ export const HOUSING_PRESETS = [
   { id: 'centennial-hills', metro: 'Las Vegas', name: 'Centennial Hills', price: 520_000, rent3br: 2_250, rent2br: 1_450 },
 ];
 
-export const METROS = [
-  'Bay Area',
-  'San Gabriel Valley (LA)',
-  'Los Angeles',
-  'Orange County',
-  'Las Vegas',
-];
+export const METROS = ['Bay Area', 'Los Angeles', 'Orange County', 'Las Vegas'];
 
 // Config patch for a preset (rents are stored annual).
 export const presetPatch = (p) => ({
