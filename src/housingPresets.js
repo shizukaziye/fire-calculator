@@ -91,19 +91,15 @@ export const HOUSING_PRESETS = [
 
 export const METROS = ['Bay Area', 'Los Angeles', 'Orange County', 'Las Vegas'];
 
-// Config patch for a preset (rents are stored annual).
+// Config patch for a preset (rents are stored annual). housingPresetId is
+// carried in the config so the dropdown reflects what was actually picked —
+// several areas legitimately share identical numbers (e.g. Newark and Castro
+// Valley), so inferring the selection back from values is ambiguous. Hand-
+// editing any of the three values in the Housing panel clears the id (see
+// App.setField), which is what flips the dropdown to "Custom".
 export const presetPatch = (p) => ({
+  housingPresetId: p.id,
   housePrice: p.price,
   rentFamily: p.rent3br * 12,
   rentSolo: p.rent2br * 12,
 });
-
-// Which preset (if any) matches the current config exactly — used so the
-// dropdown shows "Custom" once the user fine-tunes any of the three values.
-export const matchPreset = (config) =>
-  HOUSING_PRESETS.find(
-    (p) =>
-      p.price === config.housePrice &&
-      p.rent3br * 12 === config.rentFamily &&
-      p.rent2br * 12 === config.rentSolo
-  );

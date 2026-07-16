@@ -3,7 +3,7 @@
 // They edit the same config keys, so everything stays in sync.
 
 import { DEFAULTS } from '../fireModel';
-import { HOUSING_PRESETS, METROS, matchPreset, presetPatch } from '../housingPresets';
+import { HOUSING_PRESETS, METROS, presetPatch } from '../housingPresets';
 import Field from './Field';
 
 // Master knobs: drag one number and its whole group scales proportionally
@@ -30,7 +30,7 @@ const usd = (n) => '$' + Math.round(n).toLocaleString();
 // in one go. Shows "Custom" whenever the sliders have been hand-tuned away
 // from any preset.
 function HousingPreset({ config, setFields }) {
-  const current = matchPreset(config);
+  const current = config.housingPresetId;
   return (
     <div className="py-1.5">
       <div className="flex items-center justify-between gap-2">
@@ -39,7 +39,7 @@ function HousingPreset({ config, setFields }) {
         </label>
         <select
           id="housing-preset"
-          value={current ? current.id : 'custom'}
+          value={current ?? 'custom'}
           onChange={(e) => {
             const p = HOUSING_PRESETS.find((x) => x.id === e.target.value);
             if (p) setFields(presetPatch(p));

@@ -62,6 +62,7 @@ export const DEFAULTS = {
 
   // --- housing (defaults = the "LA average" preset in housingPresets.js;
   //     house/3BR figures are for the plan's 3BR ~2,000 sqft spec) ---
+  housingPresetId: 'la-average', // which preset the dropdown shows; null = Custom
   buyHome: false,         // false = rent the whole way (no purchase, no mortgage)
   rentSolo: 34_800,       // 2BR while solo ($2,900/mo today $)
   rentFamily: 56_400,     // 3BR ~2,000 sqft house once married/kids ($4,700/mo)

@@ -44,7 +44,15 @@ export default function App() {
   const [mode, setMode] = useState('fixed');
   const [dollars, setDollars] = useState('today'); // 'today' | 'nominal'
 
-  const setField = (key, value) => setConfig((c) => ({ ...c, [key]: value }));
+  // Hand-editing any of the three preset-controlled housing values detaches
+  // the config from the selected preset (dropdown shows "Custom").
+  const PRESET_KEYS = ['housePrice', 'rentFamily', 'rentSolo'];
+  const setField = (key, value) =>
+    setConfig((c) => ({
+      ...c,
+      [key]: value,
+      ...(PRESET_KEYS.includes(key) ? { housingPresetId: null } : {}),
+    }));
   const setFields = (patch) => setConfig((c) => ({ ...c, ...patch }));
   const reset = () => setConfig({ ...DEFAULTS });
 
