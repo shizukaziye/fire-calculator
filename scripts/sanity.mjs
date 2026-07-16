@@ -6,13 +6,15 @@ import { simulateMonteCarlo } from '../src/sim.js';
 const pct = (x) => (x * 100).toFixed(1) + '%';
 const k = (x) => '$' + Math.round(x / 1000) + 'k';
 
-// The Jul-14 chat folded health insurance into the $3k/5k/7k lifestyle
-// numbers; current DEFAULTS break health out per person on top. Zero health
-// for the chat-parity checks so we compare like for like.
+// Chat-parity overrides: the Jul-14 chat folded health insurance into the
+// $3k/5k/7k lifestyle numbers (current DEFAULTS break health out per person),
+// and its housing was the Bay "2,000 sqft cheap tier" (current DEFAULTS are
+// the LA-average preset). Pin both so we compare like for like.
 const NOHEALTH = {
   healthYouWorking: 0, healthYouPre65: 0, healthYouMedicare: 0,
   healthSpouseWorking: 0, healthSpousePre65: 0, healthSpouseMedicare: 0,
   healthPerKid: 0,
+  housePrice: 950_000, rentFamily: 43_200, rentSolo: 32_400,
 };
 
 // 1) $150k MFJ pure-LTCG withdrawal -> ~6% effective (chat: ~$9.8k on $153k)

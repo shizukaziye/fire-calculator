@@ -59,10 +59,10 @@ export const SECTIONS = [
   },
   {
     id: 'income',
-    title: 'Income while working (take-home, today $)',
-    fields: [
-      { key: 'incomeToday', label: 'Annual take-home income', type: 'dollar', min: 0, max: 1_000_000, step: 5_000 },
-    ],
+    title: 'Income helper (gross → take-home)',
+    // the income amount itself lives in the BigDecisions bar; this section
+    // keeps the salary converter, whose Use button fills that knob
+    fields: [],
   },
   {
     id: 'spending',

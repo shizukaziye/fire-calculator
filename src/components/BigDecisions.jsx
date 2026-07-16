@@ -3,6 +3,7 @@
 // They edit the same config keys, so everything stays in sync.
 
 import { DEFAULTS } from '../fireModel';
+import { HOUSING_PRESETS, METROS, matchPreset, presetPatch } from '../housingPresets';
 import Field from './Field';
 
 // Master knobs: drag one number and its whole group scales proportionally
@@ -20,10 +21,56 @@ const scaleGroup = (config, anchorKey, otherKeys, newAnchor) => {
 };
 
 const LIFE_KNOB = { key: 'lifestyleSolo', label: 'Lifestyle cost (your base)', type: 'dollarMonthly', min: 0, max: 15_000, step: 100 };
-const HOUSE_KNOB = { key: 'rentFamily', label: 'Housing cost (3BR rent)', type: 'dollarMonthly', min: 0, max: 12_000, step: 50 };
+const INCOME_KNOB = { key: 'incomeToday', label: 'Income (take-home / yr)', type: 'dollar', min: 0, max: 500_000, step: 5_000 };
 
 const mo = (annual) => '$' + Math.round(annual / 12).toLocaleString() + '/mo';
 const usd = (n) => '$' + Math.round(n).toLocaleString();
+
+// Grouped dropdown of real markets; picking one sets house price + both rents
+// in one go. Shows "Custom" whenever the sliders have been hand-tuned away
+// from any preset.
+function HousingPreset({ config, setFields }) {
+  const current = matchPreset(config);
+  return (
+    <div className="py-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-sm text-slate-300" htmlFor="housing-preset">
+          Housing market
+        </label>
+        <select
+          id="housing-preset"
+          value={current ? current.id : 'custom'}
+          onChange={(e) => {
+            const p = HOUSING_PRESETS.find((x) => x.id === e.target.value);
+            if (p) setFields(presetPatch(p));
+          }}
+          className="w-56 rounded bg-slate-800 px-2 py-1.5 text-sm text-slate-100 outline-none focus:ring-1 focus:ring-emerald-400"
+        >
+          {!current && (
+            <option value="custom" disabled>
+              Custom (hand-tuned)
+            </option>
+          )}
+          {METROS.map((metro) => (
+            <optgroup key={metro} label={metro}>
+              {HOUSING_PRESETS.filter((p) => p.metro === metro).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} — {usd(p.price)}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+      <p className="mt-1.5 text-xs text-slate-500">
+        Sets house <span className="text-slate-400">{usd(config.housePrice)}</span> · 3BR{' '}
+        <span className="text-slate-400">{mo(config.rentFamily)}</span> · 2BR{' '}
+        <span className="text-slate-400">{mo(config.rentSolo)}</span> — mid-2026 medians,
+        fine-tune in the Housing panel.
+      </p>
+    </div>
+  );
+}
 
 function Segmented({ value, options, onChange }) {
   return (
@@ -162,7 +209,19 @@ export default function BigDecisions({ config, setField, setFields }) {
         </Decision>
       </div>
 
-      <div className="mt-4 grid gap-x-10 gap-y-2 border-t border-slate-800 pt-2 lg:grid-cols-2">
+      <div className="mt-4 grid gap-x-10 gap-y-2 border-t border-slate-800 pt-2 lg:grid-cols-3">
+        <div className={retiredNow ? 'opacity-40' : ''}>
+          <Field
+            field={INCOME_KNOB}
+            value={config.incomeToday}
+            onChange={(v) => setField('incomeToday', v)}
+            disabled={retiredNow}
+          />
+          <p className="text-xs text-slate-500">
+            Take-home while working (to {config.retireAge}). Gross → take-home helper is in
+            the left panel.
+          </p>
+        </div>
         <div>
           <Field
             field={LIFE_KNOB}
@@ -177,19 +236,7 @@ export default function BigDecisions({ config, setField, setFields }) {
             <span className="text-slate-400">{mo(config.lifestylePerKid)}</span> scale with it.
           </p>
         </div>
-        <div>
-          <Field
-            field={HOUSE_KNOB}
-            value={config.rentFamily}
-            onChange={(v) => setFields(scaleGroup(config, 'rentFamily', ['rentSolo', 'housePrice'], v))}
-          />
-          <p className="text-xs text-slate-500">
-            One knob for the housing market — 2BR rent{' '}
-            <span className="text-slate-400">{mo(config.rentSolo)}</span> · house price{' '}
-            <span className="text-slate-400">{usd(config.housePrice)}</span> scale with it
-            (price-to-rent stays put).
-          </p>
-        </div>
+        <HousingPreset config={config} setFields={setFields} />
       </div>
       {retiredNow && (
         <p className="mt-3 border-t border-slate-800 pt-2.5 text-xs text-amber-300/90">

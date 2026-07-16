@@ -30,9 +30,11 @@ three modes:
 - **Filing status timeline**: single until the marriage age, MFJ after —
   brackets and deductions halve while single, which is what makes a big
   down-payment withdrawal before marriage expensive.
-- **Big decisions bar**: the headline choices — stay single vs marry (and
-  when), number of kids, rent vs buy (and when) — sit above the charts;
-  the left panel keeps the granular inputs.
+- **Big decisions bar**: the headline choices — current/retire age, stay
+  single vs marry (and when), number of kids, rent vs buy (and when), income,
+  a master lifestyle knob, and a housing-market preset picker (popular Bay
+  Area / Los Angeles / Las Vegas areas, mid-2026 medians; defaults to LA
+  average) — sit above the charts; the left panel keeps the granular inputs.
 - **Additive household spending**: your base lifestyle + an amount per spouse
   (from the marriage age) + an amount per kid (from each kid's arrival, so it
   scales to any family size), plus staggered college later.
