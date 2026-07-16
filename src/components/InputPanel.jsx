@@ -43,7 +43,7 @@ const MARKET_NOTE = {
   historical:
     'Historical mode ignores these and replays actual S&P 500 returns + US CPI (1928–2025).',
   montecarlo:
-    'In Monte Carlo mode these are the MEANS each year is drawn around (see Monte Carlo settings).',
+    'In Monte Carlo mode the return is the MEDIAN of a right-skewed log-normal draw (so the median path matches Fixed return); inflation is the mean. See Monte Carlo settings.',
 };
 
 function Chevron({ open }) {

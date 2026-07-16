@@ -116,10 +116,11 @@ export function simulateMonteCarlo(cfg = {}) {
   return summarize(c, paths, { horizon: years });
 }
 
-// Success-rate bar the solved salary must clear in each sim mode. 100% of random
-// Monte Carlo paths is effectively unreachable (there's always a doomsday tail),
-// so MC uses the conventional 95% bar; historical uses every actual sequence.
-export const MIN_SALARY_TARGET = { historical: 1, montecarlo: 0.95 };
+// Success-rate bar the solved salary must clear in each sim mode: 90% for
+// both. 100% of random Monte Carlo paths is effectively unreachable (there's
+// always a doomsday tail), and demanding every 1928-start historical sequence
+// pass makes the single worst start year dictate the answer.
+export const MIN_SALARY_TARGET = { historical: 0.9, montecarlo: 0.9 };
 
 // Lowest GROSS salary (today $) whose take-home keeps the plan from running out,
 // solved in the current mode's terms:

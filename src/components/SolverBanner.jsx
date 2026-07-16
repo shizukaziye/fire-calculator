@@ -3,8 +3,8 @@ import { fmtUSD } from '../format';
 
 const targetLabel = (mode, sim) => {
   if (mode === 'historical')
-    return `so all ${sim ? sim.trials + ' ' : ''}historical sequences (1928–2025) survive`;
-  if (mode === 'montecarlo') return 'so 95% of Monte Carlo paths survive';
+    return `so ≥90% of the ${sim ? sim.trials + ' ' : ''}historical sequences (1928–2025 data) survive`;
+  if (mode === 'montecarlo') return 'so ≥90% of Monte Carlo paths survive';
   return 'so the projection never runs out';
 };
 

@@ -7,8 +7,8 @@ export default function SimSummary({ sim, config, mode }) {
 
   const sub =
     mode === 'historical'
-      ? `${sim.trials} rolling ${sim.horizon}-yr sequences, ${sim.dataRange}`
-      : `${sim.trials.toLocaleString()} random ${sim.horizon}-yr paths`;
+      ? `${sim.trials} rolling ${sim.horizon}-yr sequences (${sim.dataRange} data, starts ${sim.startYears[0]}–${sim.startYears[sim.startYears.length - 1]}) · aim ≥90%`
+      : `${sim.trials.toLocaleString()} random ${sim.horizon}-yr paths, log-normal (right-skewed) returns · aim ≥90%`;
 
   return (
     <div className="grid gap-3 sm:grid-cols-3">
