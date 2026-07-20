@@ -59,7 +59,7 @@ export default function SimTable({ sim }) {
         </table>
       </div>
       <p className="mt-2 text-xs text-slate-500">
-        Amber rows: the 10th-percentile path is already underwater by this age.
+        Amber rows: the 10th-percentile path is already below zero by this age.
         Red rows: even the median path is negative. Percentiles are computed
         across all {sim.trials.toLocaleString()} simulated paths.
       </p>

@@ -242,7 +242,7 @@ export default function BigDecisions({ config, setField, setFields }) {
         <p className="mt-3 border-t border-slate-800 pt-2.5 text-xs text-amber-300/90">
           You&apos;re already retired in this plan — no more earned income, so the
           projection is a stress test of whether the portfolio alone holds to{' '}
-          {config.endAge}. The income input is ignored.
+          {config.endAge}. It ignores the income input.
         </p>
       )}
     </section>

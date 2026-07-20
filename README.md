@@ -4,7 +4,7 @@ A single-page financial-independence / early-retirement planner. Tweak every
 assumption on the left and watch a year-by-year projection recompute live, in
 three modes:
 
-- **Fixed return** — one deterministic path at your assumed nominal return and
+- **Fixed return** — one fixed path at your assumed nominal return and
   inflation. Net-worth + after-tax liquidation lines (nominal or today's $
   toggle), a rent-vs-buy breakeven comparison, and a year-by-year table with
   per-year withdrawal tax and depleted years flagged.
@@ -24,18 +24,18 @@ three modes:
 - **Capital-gains withdrawals**: every taxable-account withdrawal is grossed up
   for tax — federal LTCG bracket stacking (0/15/20%) after the standard
   deduction, CA ordinary brackets, and NIIT (whose thresholds are deliberately
-  NOT inflation-indexed, per statute). The **"taxable balance that is gain"**
+  NOT inflation-indexed, by law). The **"taxable balance that is gain"**
   slider controls how much of each withdrawal is gain (100% = the conservative
   tax-everything rule).
 - **Filing status timeline**: single until the marriage age, MFJ after —
-  brackets and deductions halve while single, which is what makes a big
+  brackets and deductions halve while single, which makes a big
   down-payment withdrawal before marriage expensive.
 - **Big decisions bar**: the headline choices — current/retire age, stay
   single vs marry (and when), number of kids, rent vs buy (and when), income,
   a master lifestyle knob, and a housing-market preset picker (popular Bay
   Area / Los Angeles / Las Vegas areas, mid-2026 medians; defaults to LA
-  average) — sit above the charts; the left panel keeps the granular inputs.
-- **Additive household spending**: your base lifestyle + an amount per spouse
+  average) — sit above the charts; the left panel keeps the detailed inputs.
+- **Household spending that adds up**: your base lifestyle + an amount per spouse
   (from the marriage age) + an amount per kid (from each kid's arrival, so it
   scales to any family size), plus staggered college later.
 - **Per-person health**, stacked on top of lifestyle: you and spouse each

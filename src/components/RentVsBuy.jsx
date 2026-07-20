@@ -93,7 +93,7 @@ export default function RentVsBuy({ config, dollars }) {
       <p className="mt-2 text-xs text-slate-500">
         Both lines are liquidation value: taxable less the cap-gains haircut,
         pre-tax less its haircut, and (buy path) home equity net of selling
-        costs and gains tax above the Sec-121 exclusion. The buy year eats the
+        costs and gains tax above the Sec-121 exclusion. The buy year pays the
         down payment <em>plus</em> the cap-gains tax on the lump-sum withdrawal
         that funds it — that tax is why the orange line drops at purchase.
       </p>
